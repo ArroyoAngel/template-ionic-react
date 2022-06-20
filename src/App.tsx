@@ -1,7 +1,8 @@
-import { IonApp, IonRouterOutlet, IonSplitPane, setupIonicReact } from '@ionic/react';
+import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
+import React from 'react'
 import { Redirect, Route } from 'react-router-dom';
-import Menu from './components/Menu';
+import mapboxgl from 'mapbox-gl'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -22,7 +23,6 @@ import '@ionic/react/css/display.css';
 /* Theme variables */
 import './theme/variables.css';
 
-import React from 'react'
 
 /* ABOUT */
 import Policies from './view/about/Policies'
@@ -34,6 +34,9 @@ import Version from './view/settings/Version'
 import Login from './view/users/Login'
 /* ERROR */
 import Error from './view/error'
+
+/* MapBox Token asigned */
+mapboxgl.accessToken = 'pk.eyJ1IjoiYXJyb3lvYW5nZWwiLCJhIjoiY2w0bjJnZG1xMDV2ZjNmbXJpdnpsYzZkaCJ9.jy3481VyfkNYC7mlCypJyQ';
 
 setupIonicReact();
 
