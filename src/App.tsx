@@ -25,13 +25,13 @@ import './theme/variables.css';
 import React from 'react'
 
 /* ABOUT */
-import Policies from './view/about/Policies'
+import About from './view/about'
 /* APP */
 import App from './view/app'
 /* SETTINGS */
-import Version from './view/settings/Version'
+import Settings from './view/settings'
 /* USERS */
-import Login from './view/users/Login'
+import Users from './view/users'
 /* ERROR */
 import Error from './view/error'
 
@@ -43,8 +43,10 @@ const AppRender: React.FC = () => {
       <IonReactRouter>
         <IonRouterOutlet id="main">
           {/* ABOUT */}
-          <Route exact={true} path='/about'>{ <Redirect to='/about/policies'/> }</Route>
-            <Route exact={true} path='/about/policies' render={ props => <Policies {...props}/>} />
+          <Route
+            path={'/about'}
+            render={ props => <About {...props} /> }
+          />
 
           {/* APP */}
           <Route
@@ -53,15 +55,22 @@ const AppRender: React.FC = () => {
           />
 
           {/* SETTINGS */}
-          <Route exact={true} path='/settings'>{ <Redirect to='/settings/version'/> }</Route>
-            <Route exact={true} path='/settings/version' render={ props => <Version {...props}/>} />
+          <Route
+            path={'/settings'}
+            render={ props => <Settings {...props} /> }
+          />
           
           {/* USERS */}
-          <Route exact={true} path='/users'>{ <Redirect to='/users/login'/> }</Route>
-            <Route exact={true} path='/users/login' render={ props => <Login {...props}/>} />
+          <Route
+            path={'/users'}
+            render={ props => <Users {...props} /> }
+          />
 
           {/* ERROR */}
           <Route exact={true} path='/error' render={ props => <Error {...props}/>} />
+
+          {/* DEFAULT */}
+          <Route path={`/`} exact>{ <Redirect to={`app/users`}/> }</Route>
 
           {/* 404 */}
           <Route component={Error}/>
