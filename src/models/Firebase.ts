@@ -6,7 +6,7 @@ import {
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { 
   getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
-  sendPasswordResetEmail, confirmPasswordReset, signInWithPopup, GoogleAuthProvider, UserCredential 
+  sendPasswordResetEmail, confirmPasswordReset, signInWithPopup, GoogleAuthProvider, UserCredential, browserLocalPersistence, setPersistence 
 } from "firebase/auth";
 
 export const firebaseConfig = {
@@ -33,7 +33,13 @@ export async function signUpGoogle(): Promise<UserCredential>{
 }
 
 export async function loginEmailPassword(_email: string, _password: string): Promise<UserCredential> {
-  const account = await signInWithEmailAndPassword(auth, _email, _password)
+  const account = await setPersistence(auth, browserLocalPersistence).then(() => {
+    return signInWithEmailAndPassword(auth, _email, _password)
+  })
+
+  await getAuth().onAuthStateChanged( user => {
+    console.log("CURRENT LOGIN: ", user)
+  })
   return account
 }
 
