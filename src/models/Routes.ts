@@ -73,11 +73,6 @@ export const appPages: RoutePage[] = [
         icon: stopCircleOutline,
       },
     ]
-  },
-  {
-    title: 'Error',
-    url: '/error',
-    icon: ellipseOutline,
   },*/
 ];
 

@@ -27,9 +27,9 @@ const PathItems: React.FC<PathProps> = ({ pages, pathname, parent }) => {
       const fullPath = parent+appPage.url
       const isSelected = pathname.split(fullPath)[0]===''
       const state = pathname.includes(fullPath)&&isSelected  ? 'selected' : ''
-      
+
       return (
-        <IonMenuToggle key={index} autoHide={false}>
+        <IonMenuToggle key={index} autoHide={false} className={parent?'path-childrens':''}>
           <IonItem className={state} routerLink={fullPath} routerDirection="none" lines="none" detail={false}>
             <IonIcon slot='start' icon={appPage.icon} />
             <IonLabel>{appPage.title}</IonLabel>

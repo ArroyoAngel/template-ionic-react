@@ -27,8 +27,7 @@ import React from 'react'
 /* ABOUT */
 import Policies from './view/about/Policies'
 /* APP */
-import UsersList from './view/app/Users/List'
-import MainMenu from './view/app/Menu'
+import App from './view/app'
 /* SETTINGS */
 import Version from './view/settings/Version'
 /* USERS */
@@ -38,42 +37,38 @@ import Error from './view/error'
 
 setupIonicReact();
 
-const App: React.FC = () => {
+const AppRender: React.FC = () => {
   return (
     <IonApp>
       <IonReactRouter>
-        <IonSplitPane contentId="main">
-          <Menu />
-          <IonRouterOutlet id="main">
-            {/* ABOUT */}
-            <Route exact={true} path='/about'>{ <Redirect to='/about/policies'/> }</Route>
-              <Route exact={true} path='/about/policies' render={ props => <Policies {...props}/>} />
+        <IonRouterOutlet id="main">
+          {/* ABOUT */}
+          <Route exact={true} path='/about'>{ <Redirect to='/about/policies'/> }</Route>
+            <Route exact={true} path='/about/policies' render={ props => <Policies {...props}/>} />
 
-            {/* APP */}
-            <Route exact={true} path='/app'>{ <Redirect to='/app/menu'/> }</Route>
-              <Route exact={true} path='/app/users'>{ <Redirect to='/app/users/list'/> }</Route>
-                <Route exact={true} path='/app/users/list' render={ props => <UsersList {...props}/>} />
-              <Route exact={true} path='/app/menu' render={ props => <MainMenu {...props}/>} />
+          {/* APP */}
+          <Route
+            path={'/app'}
+            render={ props => <App {...props} /> }
+          />
 
-            {/* SETTINGS */}
-            <Route exact={true} path='/settings'>{ <Redirect to='/settings/version'/> }</Route>
-              <Route exact={true} path='/settings/version' render={ props => <Version {...props}/>} />
-            
-            {/* USERS */}
-            <Route exact={true} path='/users'>{ <Redirect to='/users/login'/> }</Route>
-              <Route exact={true} path='/users/login' render={ props => <Login {...props}/>} />
+          {/* SETTINGS */}
+          <Route exact={true} path='/settings'>{ <Redirect to='/settings/version'/> }</Route>
+            <Route exact={true} path='/settings/version' render={ props => <Version {...props}/>} />
+          
+          {/* USERS */}
+          <Route exact={true} path='/users'>{ <Redirect to='/users/login'/> }</Route>
+            <Route exact={true} path='/users/login' render={ props => <Login {...props}/>} />
 
-            {/* ERROR */}
-            <Route exact={true} path='/error' render={ props => <Error {...props}/>} />
+          {/* ERROR */}
+          <Route exact={true} path='/error' render={ props => <Error {...props}/>} />
 
-            {/* 404 */}
-            <Route component={Error}/>
-
-          </IonRouterOutlet>
-        </IonSplitPane>
+          {/* 404 */}
+          <Route component={Error}/>
+        </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>
   );
 };
 
-export default App;
+export default AppRender;
