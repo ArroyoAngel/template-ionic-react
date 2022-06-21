@@ -19,8 +19,8 @@ const App: React.FC<RouteComponentProps> = (props) => {
       <Menu />
       <IonRouterOutlet id="main">
         {/* APP */}
-        <Route path={`${match.path}/users`} render={ (props) => <Users {...props}/>} />
-        <Route path={`${match.path}/menu`} render={ (props) => <MainMenu {...props}/>} />
+        <Route path={`${match.path}/users`} render={ props => <Users {...props}/>} />
+        <Route path={`${match.path}/menu`} render={ props => <MainMenu {...props}/>} />
 
         <Route path={`${match.path}/`} exact>{ <Redirect to={`${match.path}/users`}/> }</Route>
       </IonRouterOutlet>

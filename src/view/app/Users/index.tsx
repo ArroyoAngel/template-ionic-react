@@ -14,7 +14,7 @@ const App: React.FC<RouteComponentProps> = (props) => {
   return (
     <IonRouterOutlet >
       {/* APP */}
-      <Route path={`${match.path}/list`} render={ (props) => <List {...props}/>} />
+      <Route path={`${match.path}/list`} render={ props => <List {...props}/>} />
 
       <Route path={`${match.path}`} exact>{ <Redirect to={`${match.path}/list`}/> }</Route>
     </IonRouterOutlet>

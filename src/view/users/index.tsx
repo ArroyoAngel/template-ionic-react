@@ -15,7 +15,7 @@ const Users: React.FC<RouteComponentProps> = (props) => {
   return (
     <IonRouterOutlet id="main">
       {/* USERS */}
-      <Route path={`${match.path}/login`} render={ (props) => <Login {...props}/>} />
+      <Route path={`${match.path}/login`} render={ props => <Login {...props}/>} />
 
       <Route path={`${match.path}/`} exact>{ <Redirect to={`${match.path}/login`}/> }</Route>
     </IonRouterOutlet>

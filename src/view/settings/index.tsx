@@ -13,7 +13,7 @@ const Settings: React.FC<RouteComponentProps> = (props) => {
   return (
     <IonRouterOutlet id="main">
       {/* SETTINGS */}
-      <Route path={`${match.path}/version`} render={ () => <Version {...props}/>} />
+      <Route path={`${match.path}/version`} render={ props => <Version {...props}/>} />
 
       <Route path={`${match.path}/`} exact>{ <Redirect to={`${match.path}/version`}/> }</Route>
     </IonRouterOutlet>
