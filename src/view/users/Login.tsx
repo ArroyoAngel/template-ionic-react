@@ -15,13 +15,15 @@ export const Login: React.FC<Props> = (props: Props) => {
     const { history } = props
     dispatch(loginUser({email, password, history }))
   }
-  return <IonContent>
-    <IonInput type="email" placeholder="correo" onIonChange={(e: any)=>setEmail(e.detail.value)} />
-    <IonInput type="text" placeholder="contraseña" onIonChange={(e: any)=>setPassword(e.detail.value)} />
-    <IonButton onClick={()=>login()} >
-      LOGIN
-    </IonButton>
-  </IonContent>
+  return (
+    <IonContent>
+      <IonInput type="email" placeholder="correo" onIonChange={(e: any)=>setEmail(e.detail.value)} />
+      <IonInput type="text" placeholder="contraseña" onIonChange={(e: any)=>setPassword(e.detail.value)} />
+      <IonButton onClick={()=>login()} >
+        LOGIN
+      </IonButton>
+    </IonContent>
+    )
 }
 
 export default Login;
