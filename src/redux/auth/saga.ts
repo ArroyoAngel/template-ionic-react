@@ -25,7 +25,7 @@ function* loginUser({ payload }: PayloadAction<{ email: string, password: string
   }else{
     yield put(authError(result))
   }
-  history.push('/app/users/list')
+  history.push('/app/users')
 }
 export function* watchLoginUser() {
   yield takeEvery('auth/loginUser', loginUser);
