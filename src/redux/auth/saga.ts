@@ -3,29 +3,60 @@ import { authError, authSuccess } from './reducer'
 import {  PayloadAction } from '@reduxjs/toolkit';
 
 import { History } from 'history';
-import { getDocuments, getData, loginEmailPassword } from '../../models/Firebase'
+import Firebase from '../../models/Firebase'
 import { FirebaseErrors } from '../../constants/Firebase'
 import { UserCredential } from 'firebase/auth';
+import { isUserCredential } from '../../helpers/instanceof'
+import { DocumentData, Query } from 'firebase/firestore';
+import { Account } from '../../models/Account';
 
-/* LOGIN USER */
-async function loginUserAsync(email: string, password: string) {
-  /*const collection = await getDocuments('orders', ['state', '==', 'pending'])
-  const result = await getData(collection)
-  console.log(result)*/
-  const response = await loginEmailPassword(email, password).catch( error => {
-    return { error: FirebaseErrors[error.code] }
-  })
-  return response
+
+/* GET ACCOUNT */
+async function getAccountAsync(email: string): Promise<any> {
+  const response: Query<DocumentData> = await Firebase.getDocuments('accounts', ['email', '==', email])
+  const data = await Firebase.getData(response)
+  return data[0]
 }
-function* loginUser({ payload }: PayloadAction<{ email: string, password: string, history: History }>): any {
-  const { email, password, history } = payload
-  const result = yield call(loginUserAsync, email, password);
+
+function* getAccountGenerator({ payload }: PayloadAction<{ email: string }>): any {
+  const { email } = payload
+  const result = yield call(getAccountAsync, email);
   if(!result.error){
     yield put(authSuccess(result))
   }else{
     yield put(authError(result))
   }
-  history.push('/app/users')
+}
+export function* watchGetAccount() {
+  yield takeEvery('auth/loginUser', getAccountGenerator);
+}
+
+/* LOGIN USER */
+async function loginUserAsync(email: string, password: string): Promise< UserCredential|unknown> {
+
+  const account = await Firebase.loginEmailPassword(email, password).catch( error => {
+    const firebaseResponse: string|unknown = FirebaseErrors[error.code]
+    if(firebaseResponse)return { error: firebaseResponse }
+    else return { error: 'Error no conocido, contacte al administrador.' }
+  })
+  if(isUserCredential(account) && account.user.email){
+    const data = await getAccountAsync(account.user.email)
+    const modelData: Account = new Account(data.id, data.email, data.created, data.available, account.user)
+    if(modelData.available)return modelData
+    else return { error: 'Esta cuenta esta deshabilitada' }
+  }
+}
+
+function* loginUser({ payload }: PayloadAction<{ email: string, password: string, history: History }>): any {
+  const { email, password, history } = payload
+  const result: any = yield call(loginUserAsync, email, password);
+  if(!result.error){
+    result.signInPersistence(result.credential.stsTokenManager)
+    yield put(authSuccess(result))
+    history.push('/app/users')
+  }else{
+    yield put(authError(result))
+  }
 }
 export function* watchLoginUser() {
   yield takeEvery('auth/loginUser', loginUser);
@@ -34,6 +65,7 @@ export function* watchLoginUser() {
 /* EXPORTS SAGAS */
 export default function* rootSaga() {
   yield all([
-      fork(watchLoginUser)
+      fork(watchLoginUser),
+      fork(watchGetAccount)
   ]);
 }

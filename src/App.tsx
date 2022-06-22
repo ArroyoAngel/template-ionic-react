@@ -1,6 +1,6 @@
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
-import { Redirect, Route } from 'react-router-dom';
+import { Redirect, Route, useHistory } from 'react-router-dom';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -22,6 +22,7 @@ import '@ionic/react/css/display.css';
 import './theme/variables.css';
 
 import React, { Suspense } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 /* ABOUT */
 import About from './view/about'
@@ -34,17 +35,13 @@ import Users from './view/users'
 /* ERROR */
 import Error from './view/error'
 
-
-/* ABOUT */
-import Policies from './view/about/Policies'
-/* SETTINGS */
-import Version from './view/settings/Version'
-/* USERS */
-import Login from './view/users/Login'
-
 setupIonicReact();
 
+
 const AppRender: React.FC = () => {
+  const dispatch = useDispatch()
+  const idToken = localStorage.getItem('refreshToken')
+  //useSelector((state)=>console.log(state))
   return (
     <IonApp>
       <Suspense fallback={<div className='loading'/>}>

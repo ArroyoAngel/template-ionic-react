@@ -1,5 +1,4 @@
 import { IonRouterOutlet } from '@ionic/react';
-import { IonReactRouter } from '@ionic/react-router';
 import { Redirect, Route } from 'react-router-dom';
 import { RouteComponentProps } from "react-router";
 import React from 'react'
