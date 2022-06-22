@@ -34,14 +34,22 @@ import Settings from './view/settings'
 import Users from './view/users'
 /* ERROR */
 import Error from './view/error'
-
+import { refreshToken } from './redux/auth/reducer';
+import { getAuth } from 'firebase/auth'
 setupIonicReact();
 
 
 const AppRender: React.FC = () => {
   const dispatch = useDispatch()
-  const idToken = localStorage.getItem('refreshToken')
-  //useSelector((state)=>console.log(state))
+
+  getAuth().onAuthStateChanged(async (user) => {
+    await user?.getIdToken(true).then((idToken)=>{
+      return idToken
+    })
+    await dispatch(refreshToken({ user: user }))
+  });
+
+  useSelector((state: any)=>console.log(state.auth))
   return (
     <IonApp>
       <Suspense fallback={<div className='loading'/>}>

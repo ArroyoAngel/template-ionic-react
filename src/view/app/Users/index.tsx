@@ -9,7 +9,6 @@ const List = React.lazy(() =>
 
 const App: React.FC<RouteComponentProps> = (props) => {
   const { match } = props
-  console.log(match.path)
   return (
     <IonRouterOutlet >
       {/* APP */}

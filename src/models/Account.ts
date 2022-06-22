@@ -1,25 +1,20 @@
-import { User } from "firebase/auth";
-import { Timestamp } from "firebase/firestore";
+import { User, UserInfo, UserMetadata } from "firebase/auth";
+import { accounts } from './Firestore'
+
 
 export class Account {
-  public id: string;
-  public email: string;
-  public created: string|Date;
-  public available: boolean;
-  public credential: User;
-  constructor(_id: string, _email: string, _created: Timestamp, _available: boolean, _credential: User ){
-    this.id = _id;
-    this.email = _email;
-    this.created = new Date(_created.seconds*1000);
-    this.available = _available;
-    this.credential = _credential;
+  public providerData: UserInfo;
+  public metadata: UserMetadata;
+  public session: Object;
+  public data: accounts;
+  constructor(_providerData: UserInfo, _metadata: UserMetadata, _session: Object, _data: accounts ){
+    this.providerData = _providerData;
+    this.metadata = _metadata;
+    this.session = _session;
+    this.data = _data;
   }
-  protected signInPersistence(stsTokenManager: any){
-    const { accessToken, expirationTime, refreshToken } = stsTokenManager
-    localStorage.setItem('accessToken', accessToken)
-    localStorage.setItem('expirationTime', expirationTime)
-    localStorage.setItem('refreshToken', refreshToken)
-    localStorage.setItem('email', this.email)
-    localStorage.setItem('id', this.id)
+  protected signInPersistence(){
+    localStorage.setItem('session', JSON.stringify(this.session))
+    localStorage.setItem('user_data', JSON.stringify(this.data))
   }
 }

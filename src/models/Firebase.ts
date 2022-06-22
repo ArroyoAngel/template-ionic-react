@@ -32,12 +32,13 @@ export class Firebase {
     this.app = initializeApp(firebaseConfig)
     this.auth = getAuth()
     this.currentUser = null
-    this.auth.onAuthStateChanged(async (user: any) => {
+    this.auth.onAuthStateChanged(async (user) => {
       this.currentUser = user
-      const tokenResponse = await user?.getIdToken(true).then((idToken: any)=>{
+      await user?.getIdToken(true).then((idToken)=>{
         return idToken
       })
-      console.log(new Date(user.stsTokenManager.expirationTime))
+      const test: any = user
+      localStorage.setItem('session', JSON.stringify(test.stsTokenManager))
     });
     this.db = getFirestore(this.app)
     this.storage = getStorage();

@@ -21,6 +21,7 @@ async function getAccountAsync(email: string): Promise<any> {
 function* getAccountGenerator({ payload }: PayloadAction<{ email: string }>): any {
   const { email } = payload
   const result = yield call(getAccountAsync, email);
+  console.log("asdasdasdasassad")
   if(!result.error){
     yield put(authSuccess(result))
   }else{
@@ -28,7 +29,7 @@ function* getAccountGenerator({ payload }: PayloadAction<{ email: string }>): an
   }
 }
 export function* watchGetAccount() {
-  yield takeEvery('auth/loginUser', getAccountGenerator);
+  yield takeEvery('auth/getAccount', getAccountGenerator);
 }
 
 /* LOGIN USER */
@@ -39,10 +40,12 @@ async function loginUserAsync(email: string, password: string): Promise< UserCre
     if(firebaseResponse)return { error: firebaseResponse }
     else return { error: 'Error no conocido, contacte al administrador.' }
   })
+  const { user }: any = account
   if(isUserCredential(account) && account.user.email){
     const data = await getAccountAsync(account.user.email)
-    const modelData: Account = new Account(data.id, data.email, data.created, data.available, account.user)
-    if(modelData.available)return modelData
+    const modelData: Account = new Account(user.providerData[0], user.metadata, user.stsTokenManager, data)
+
+    if(data.available)return modelData
     else return { error: 'Esta cuenta esta deshabilitada' }
   }
 }
@@ -51,7 +54,8 @@ function* loginUser({ payload }: PayloadAction<{ email: string, password: string
   const { email, password, history } = payload
   const result: any = yield call(loginUserAsync, email, password);
   if(!result.error){
-    result.signInPersistence(result.credential.stsTokenManager)
+    result.signInPersistence()
+
     yield put(authSuccess(result))
     history.push('/app/users')
   }else{
