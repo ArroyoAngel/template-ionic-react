@@ -1,12 +1,12 @@
-import { initializeApp } from 'firebase/app';
+import { FirebaseApp, initializeApp } from 'firebase/app';
 import { 
   getFirestore, setDoc, collection, doc, getDocs, addDoc, 
-  query, where, WhereFilterOp, Query, DocumentData 
+  query, where, WhereFilterOp, Query, DocumentData, FieldPath, Firestore 
 } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getStorage, ref, uploadBytes, getDownloadURL, FirebaseStorage } from "firebase/storage";
 import { 
-  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
-  sendPasswordResetEmail, confirmPasswordReset, signInWithPopup, GoogleAuthProvider, UserCredential 
+  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithCustomToken,
+  sendPasswordResetEmail, confirmPasswordReset, signInWithPopup, GoogleAuthProvider, UserCredential, browserLocalPersistence, setPersistence, User, Auth 
 } from "firebase/auth";
 
 export const firebaseConfig = {
@@ -19,59 +19,84 @@ export const firebaseConfig = {
   measurementId: "G-SCTKDXZZZL"
 };
 
-export const app = initializeApp(firebaseConfig)
-export const auth = getAuth()
-export const db = getFirestore(app)
-export const storage = getStorage();
-export const provider = {
-  google: new GoogleAuthProvider()
-}
-
-export async function signUpGoogle(): Promise<UserCredential>{
-  const account = await signInWithPopup(auth, provider.google)
-  return account
-}
-
-export async function loginEmailPassword(_email: string, _password: string): Promise<UserCredential> {
-  const account = await signInWithEmailAndPassword(auth, _email, _password)
-  return account
-}
-
-export async function registerEmailPassword(_email: string, _password: string): Promise<UserCredential> {
-  const account = await createUserWithEmailAndPassword(auth, _email, _password)
-  return account
-}
-
-export async function uploadFile(_url: string, _file: File): Promise<string> {
-  const refFile = await ref(storage, `${_url}/${_file.name}`)
-  await uploadBytes(refFile, _file)
-  const URL = await getDownloadURL(refFile).then(urlFile=>urlFile)
-  return URL
-}
-
-export async function getDocuments(_collection: string, _query?: [string, WhereFilterOp, string]): Promise<Query<DocumentData>> {
-  if(_query)
-    return await query(collection(db, _collection), where(_query[0], _query[1], _query[2]))
-  else
-    return await query(collection(db, _collection))
-}
-
-export async function setDocument(_collection: string, _document: Object, _uid?: string){
-  if(_uid){
-    await setDoc(doc(db, _collection, _uid), { ..._document }, { merge: true })
+export class Firebase {
+  private app: FirebaseApp;
+  private auth: Auth;
+  private currentUser: User | null;
+  private db: Firestore
+  private storage: FirebaseStorage
+  private provider: {
+    google: GoogleAuthProvider
   }
-  else{
-    await addDoc(collection(db, _collection), _document).then( e => {
-      setDoc(doc(db, _collection, e.id), { id: e.id }, { merge: true })
+  constructor(){
+    this.app = initializeApp(firebaseConfig)
+    this.auth = getAuth()
+    this.currentUser = null
+    this.auth.onAuthStateChanged(async (user: any) => {
+      this.currentUser = user
+      const tokenResponse = await user?.getIdToken(true).then((idToken: any)=>{
+        return idToken
+      })
+      console.log(new Date(user.stsTokenManager.expirationTime))
+    });
+    this.db = getFirestore(this.app)
+    this.storage = getStorage();
+    this.provider = {
+      google: new GoogleAuthProvider()
+    }
+  }
+  
+  async signUpGoogle(): Promise<UserCredential>{
+    const account = await signInWithPopup(this.auth, this.provider.google)
+    return account
+  }
+
+  async loginEmailPassword(_email: string, _password: string): Promise<UserCredential> {
+    const account: UserCredential = await setPersistence(this.auth, browserLocalPersistence).then(() => {
+      return signInWithEmailAndPassword(this.auth, _email, _password)
     })
+    this.currentUser = account.user
+    return account
+  }
+
+  async registerEmailPassword(_email: string, _password: string): Promise<UserCredential> {
+    const account = await createUserWithEmailAndPassword(this.auth, _email, _password)
+    return account
+  }
+
+  async uploadFile(_url: string, _file: File): Promise<string> {
+    const refFile = await ref(this.storage, `${_url}/${_file.name}`)
+    await uploadBytes(refFile, _file)
+    const URL = await getDownloadURL(refFile).then(urlFile=>urlFile)
+    return URL
+  }
+
+  async getDocuments(_collection: string, _query?: [string|FieldPath, WhereFilterOp, unknown]): Promise<Query<DocumentData>> {
+    if(_query)
+      return await query(collection(this.db, _collection), where(_query[0], _query[1], _query[2]))
+    else
+      return await query(collection(this.db, _collection))
+  }
+
+  async setDocument(_collection: string, _document: Object, _uid?: string){
+    if(_uid){
+      await setDoc(doc(this.db, _collection, _uid), { ..._document }, { merge: true })
+    }
+    else{
+      await addDoc(collection(this.db, _collection), _document).then( e => {
+        setDoc(doc(this.db, _collection, e.id), { id: e.id }, { merge: true })
+      })
+    }
+  }
+
+  public async getData(query: Query<DocumentData>): Promise<any> {
+    const docs = await getDocs(query)
+    let result: Array<DocumentData> = []
+    await docs.forEach((doc) => {
+      result.push(doc.data())
+    })
+    return result
   }
 }
 
-export async function getData(query: Query<DocumentData>): Promise<any> {
-  const docs = await getDocs(query)
-  let result: Array<DocumentData> = []
-  await docs.forEach((doc) => {
-    result.push(doc.data())
-  })
-  return result
-}
+export default new Firebase()
