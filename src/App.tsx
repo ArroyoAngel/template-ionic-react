@@ -49,7 +49,7 @@ const AppRender: React.FC = () => {
     await dispatch(refreshToken({ user: user }))
   });
 
-  useSelector((state: any)=>console.log(state.auth))
+  //useSelector((state: any)=>console.log(state.auth))
   return (
     <IonApp>
       <Suspense fallback={<div className='loading'/>}>

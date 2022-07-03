@@ -3,6 +3,7 @@ import { RouteComponentProps } from "react-router";
 import { IonButton, IonContent, IonInput } from "@ionic/react";
 import { useDispatch } from 'react-redux'
 import { loginUser } from '../../redux/auth/reducer'
+import Canvas from "../../components/Canvas";
 
 interface P {}
 type Props = P & RouteComponentProps
@@ -22,6 +23,7 @@ export const Login: React.FC<Props> = (props: Props) => {
       <IonButton onClick={()=>login()} >
         LOGIN
       </IonButton>
+      <Canvas/>
     </IonContent>
     )
 }
